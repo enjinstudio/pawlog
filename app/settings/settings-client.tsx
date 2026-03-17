@@ -14,6 +14,8 @@ interface SettingsClientProps {
   user: User;
 }
 
+const spring = { type: "spring" as const, stiffness: 300, damping: 20 };
+
 export function SettingsClient({ user }: SettingsClientProps) {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
@@ -39,15 +41,18 @@ export function SettingsClient({ user }: SettingsClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5]">
-      <header className="border-b border-[#222] px-6 py-4">
+    <div className="min-h-screen" style={{ background: "#FEFCF8", color: "#2D2420" }}>
+      <header
+        className="px-6 py-4"
+        style={{ borderBottom: "1.5px solid #EBE7E0", background: "#FFFFFF" }}
+      >
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
             <span className="text-xl">🐾</span>
-            <span className="font-bold tracking-tight">PawLog</span>
+            <span className="font-semibold tracking-tight" style={{ color: "#2D2420" }}>PawLog</span>
           </Link>
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-[#f5f5f5]/50 hover:text-[#f5f5f5]">
+            <Button variant="ghost" size="sm" style={{ color: "#8C7B72" }} className="hover:text-[#2D2420]">
               ← Dashboard
             </Button>
           </Link>
@@ -58,97 +63,135 @@ export function SettingsClient({ user }: SettingsClientProps) {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
+          transition={{ duration: 0.35, ...spring }}
         >
-          <h1 className="text-2xl font-bold mb-1">Settings</h1>
-          <p className="text-[#f5f5f5]/40 text-sm mb-8">Manage your account and preferences.</p>
+          <h1 className="text-2xl font-semibold mb-1" style={{ color: "#2D2420" }}>
+            Settings ⚙️
+          </h1>
+          <p className="text-sm mb-8" style={{ color: "#8C7B72" }}>
+            Manage your account and preferences.
+          </p>
         </motion.div>
 
         {/* Account */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.05 }}
-          className="bg-[#141414] border border-[#222] p-6"
+          transition={{ duration: 0.35, delay: 0.05, ...spring }}
+          className="card p-6"
+          style={{ background: "#FFFFFF" }}
         >
-          <h2 className="font-semibold mb-4 text-[#f5f5f5]/80">Account</h2>
+          <h2 className="font-semibold mb-4" style={{ color: "#2D2420" }}>Account</h2>
           <div className="space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-[#222]">
-              <span className="text-sm text-[#f5f5f5]/60">Email</span>
-              <span className="text-sm text-[#f5f5f5]">{user.email}</span>
+            <div
+              className="flex items-center justify-between py-2.5"
+              style={{ borderBottom: "1.5px solid #EBE7E0" }}
+            >
+              <span className="text-sm" style={{ color: "#8C7B72" }}>Email</span>
+              <span className="text-sm font-medium" style={{ color: "#2D2420" }}>{user.email}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-[#222]">
-              <span className="text-sm text-[#f5f5f5]/60">Plan</span>
-              <span className="text-sm text-[#f5f5f5]">Free</span>
+            <div
+              className="flex items-center justify-between py-2.5"
+              style={{ borderBottom: "1.5px solid #EBE7E0" }}
+            >
+              <span className="text-sm" style={{ color: "#8C7B72" }}>Plan</span>
+              <span
+                className="text-xs px-2.5 py-0.5 rounded-full font-semibold"
+                style={{ background: "#E8F8EF", color: "#2E7D52" }}
+              >
+                Free
+              </span>
             </div>
-            <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-[#f5f5f5]/60">Member since</span>
-              <span className="text-sm text-[#f5f5f5]/60">
+            <div className="flex items-center justify-between py-2.5">
+              <span className="text-sm" style={{ color: "#8C7B72" }}>Member since</span>
+              <span className="text-sm" style={{ color: "#C4B8B0" }}>
                 {new Date(user.created_at).toLocaleDateString("en-AU", {
-                  month: "long", year: "numeric"
+                  month: "long",
+                  year: "numeric",
                 })}
               </span>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-4 border-[#333] text-[#f5f5f5]/60 hover:text-[#f5f5f5] hover:bg-[#1a1a1a]"
+          <motion.button
+            className="btn-secondary mt-5 text-sm"
+            style={{ minHeight: 40, padding: "0 1.2rem" }}
             onClick={handleSignOut}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={spring}
           >
             Sign Out
-          </Button>
+          </motion.button>
         </motion.div>
 
         {/* Billing */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.1 }}
-          className="bg-[#141414] border border-[#E3170A]/20 p-6"
+          transition={{ duration: 0.35, delay: 0.1, ...spring }}
+          className="card p-6"
+          style={{ background: "#FFFFFF", borderColor: "#FF6B8A", borderWidth: "1.5px" }}
         >
-          <h2 className="font-semibold mb-2 text-[#f5f5f5]/80">Billing</h2>
-          <p className="text-sm text-[#f5f5f5]/50 mb-4">
+          <h2 className="font-semibold mb-2" style={{ color: "#2D2420" }}>Billing ✨</h2>
+          <p className="text-sm mb-4" style={{ color: "#8C7B72", lineHeight: 1.6 }}>
             You&apos;re on the free plan. Upgrade to Premium for unlimited pets, entries, and more.
           </p>
-          <div className="bg-[#0a0a0a] border border-[#222] p-4 mb-4">
+          <div
+            className="p-4 mb-4 rounded-xl"
+            style={{ background: "#FFF0F3", border: "1.5px solid #FFD6E0" }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">PawLog Premium</div>
-                <div className="text-sm text-[#f5f5f5]/40">Unlimited everything</div>
+                <div className="font-semibold" style={{ color: "#2D2420" }}>PawLog Premium</div>
+                <div className="text-sm" style={{ color: "#8C7B72" }}>Unlimited everything 🐾</div>
               </div>
               <div className="text-right">
-                <div className="font-bold text-[#E3170A]">$2.99<span className="text-sm font-normal text-[#f5f5f5]/40">/mo</span></div>
+                <div className="font-bold" style={{ color: "#FF6B8A" }}>
+                  $2.99
+                  <span className="text-sm font-normal" style={{ color: "#8C7B72" }}>/mo</span>
+                </div>
               </div>
             </div>
           </div>
-          <Button
-            className="bg-[#E3170A] hover:bg-[#E3170A]/90 text-white border-0"
+          <motion.button
+            className="btn-primary"
             onClick={() => setShowUpgrade(true)}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={spring}
           >
             ✦ Upgrade to Premium
-          </Button>
+          </motion.button>
         </motion.div>
 
         {/* Danger Zone */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.15 }}
-          className="bg-[#141414] border border-red-900/30 p-6"
+          transition={{ duration: 0.35, delay: 0.15, ...spring }}
+          className="card p-6"
+          style={{ background: "#FFFFFF", borderColor: "#FECACA", borderWidth: "1.5px" }}
         >
-          <h2 className="font-semibold mb-2 text-red-400">Danger Zone</h2>
-          <p className="text-sm text-[#f5f5f5]/50 mb-4">
+          <h2 className="font-semibold mb-2" style={{ color: "#C53030" }}>Danger Zone</h2>
+          <p className="text-sm mb-4" style={{ color: "#8C7B72", lineHeight: 1.6 }}>
             Permanently delete your account and all associated data. This cannot be undone.
           </p>
-          <Button
-            variant="outline"
-            className="border-red-900/50 text-red-400 hover:bg-red-900/20 hover:border-red-700"
+          <motion.button
+            className="rounded-full px-5 text-sm font-semibold transition-colors"
+            style={{
+              minHeight: 40,
+              background: "#FEE7E7",
+              color: "#C53030",
+              border: "1.5px solid #FECACA",
+            }}
             onClick={handleDeleteAccount}
             disabled={deletingAccount}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={spring}
           >
             Delete Account
-          </Button>
+          </motion.button>
         </motion.div>
       </main>
 

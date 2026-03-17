@@ -17,6 +17,15 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
+const spring = { type: "spring" as const, stiffness: 300, damping: 20 };
+
+const inputStyle = {
+  background: "#FEFCF8",
+  border: "1.5px solid #EBE7E0",
+  color: "#2D2420",
+  borderRadius: 8,
+};
+
 export default function NewPetPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -67,7 +76,7 @@ export default function NewPetPage() {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success(`${form.name} added successfully!`);
+        toast.success(`${form.name} added successfully! 🐾`);
         router.push(`/pets/${data.id}`);
       }
     } catch {
@@ -78,15 +87,18 @@ export default function NewPetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5]">
-      <header className="border-b border-[#222] px-6 py-4">
+    <div className="min-h-screen" style={{ background: "#FEFCF8", color: "#2D2420" }}>
+      <header
+        className="px-6 py-4"
+        style={{ borderBottom: "1.5px solid #EBE7E0", background: "#FFFFFF" }}
+      >
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
             <span className="text-xl">🐾</span>
-            <span className="font-bold tracking-tight">PawLog</span>
+            <span className="font-semibold tracking-tight" style={{ color: "#2D2420" }}>PawLog</span>
           </Link>
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-[#f5f5f5]/50 hover:text-[#f5f5f5]">
+            <Button variant="ghost" size="sm" style={{ color: "#8C7B72" }} className="hover:text-[#2D2420]">
               ← Dashboard
             </Button>
           </Link>
@@ -97,56 +109,101 @@ export default function NewPetPage() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
+          transition={{ duration: 0.35, ...spring }}
         >
           <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-1">Add a new pet</h1>
-            <p className="text-[#f5f5f5]/40 text-sm">Fill in your dog&apos;s details to get started.</p>
+            <h1 className="text-2xl font-semibold mb-1" style={{ color: "#2D2420" }}>
+              Add a new pet 🐶
+            </h1>
+            <p className="text-sm" style={{ color: "#8C7B72" }}>
+              Fill in your dog&apos;s details to get started.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="bg-[#141414] border border-[#222] p-6 space-y-5">
-              <h2 className="font-medium text-[#f5f5f5]/70 text-sm uppercase tracking-wider mb-4">Basic Info</h2>
+            <div className="card p-6 space-y-5" style={{ background: "#FFFFFF" }}>
+              <h2
+                className="font-semibold text-sm uppercase tracking-wider mb-4 flex items-center gap-2"
+                style={{ color: "#8C7B72" }}
+              >
+                📋 Basic Info
+              </h2>
 
               <div className="space-y-2">
-                <Label className="text-[#f5f5f5]/70 text-sm">Pet name *</Label>
+                <Label
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: "#8C7B72" }}
+                >
+                  Pet name *
+                </Label>
                 <Input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="e.g. Buddy, Max, Bella"
                   required
-                  className="bg-[#0a0a0a] border-[#333] text-[#f5f5f5] placeholder:text-[#f5f5f5]/30 focus:border-[#E3170A] h-10"
+                  className="h-11"
+                  style={inputStyle}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[#f5f5f5]/70 text-sm">Breed</Label>
+                <Label
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: "#8C7B72" }}
+                >
+                  Breed
+                </Label>
                 <Input
                   value={form.breed}
                   onChange={(e) => setForm({ ...form, breed: e.target.value })}
                   placeholder="e.g. Labrador Retriever"
-                  className="bg-[#0a0a0a] border-[#333] text-[#f5f5f5] placeholder:text-[#f5f5f5]/30 focus:border-[#E3170A] h-10"
+                  className="h-11"
+                  style={inputStyle}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[#f5f5f5]/70 text-sm">Date of birth</Label>
+                  <Label
+                    className="text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: "#8C7B72" }}
+                  >
+                    Date of birth
+                  </Label>
                   <Input
                     type="date"
                     value={form.dob}
                     onChange={(e) => setForm({ ...form, dob: e.target.value })}
-                    className="bg-[#0a0a0a] border-[#333] text-[#f5f5f5] focus:border-[#E3170A] h-10"
+                    className="h-11"
+                    style={inputStyle}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-[#f5f5f5]/70 text-sm">Gender</Label>
-                  <Select value={form.gender || ""} onValueChange={(v) => setForm({ ...form, gender: v ?? "" })}>
-                    <SelectTrigger className="bg-[#0a0a0a] border-[#333] text-[#f5f5f5] h-10">
+                  <Label
+                    className="text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: "#8C7B72" }}
+                  >
+                    Gender
+                  </Label>
+                  <Select
+                    value={form.gender || ""}
+                    onValueChange={(v) => setForm({ ...form, gender: v ?? "" })}
+                  >
+                    <SelectTrigger
+                      className="h-11"
+                      style={inputStyle}
+                    >
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#141414] border-[#333] text-[#f5f5f5]">
+                    <SelectContent
+                      style={{
+                        background: "#FFFFFF",
+                        border: "1.5px solid #EBE7E0",
+                        color: "#2D2420",
+                        borderRadius: 12,
+                      }}
+                    >
                       <SelectItem value="male">Male ♂️</SelectItem>
                       <SelectItem value="female">Female ♀️</SelectItem>
                       <SelectItem value="unknown">Unknown</SelectItem>
@@ -156,7 +213,12 @@ export default function NewPetPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[#f5f5f5]/70 text-sm">Current weight (kg)</Label>
+                <Label
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: "#8C7B72" }}
+                >
+                  ⚖️ Current weight (kg)
+                </Label>
                 <Input
                   type="number"
                   step="0.1"
@@ -164,33 +226,40 @@ export default function NewPetPage() {
                   value={form.weight_kg}
                   onChange={(e) => setForm({ ...form, weight_kg: e.target.value })}
                   placeholder="e.g. 25.5"
-                  className="bg-[#0a0a0a] border-[#333] text-[#f5f5f5] placeholder:text-[#f5f5f5]/30 focus:border-[#E3170A] h-10"
+                  className="h-11"
+                  style={inputStyle}
                 />
               </div>
             </div>
 
             <div className="flex gap-3">
-              <Button
+              <motion.button
                 type="submit"
                 disabled={loading || !form.name.trim()}
-                className="flex-1 bg-[#E3170A] hover:bg-[#E3170A]/90 text-white border-0 h-11"
+                className="btn-primary flex-1"
+                whileHover={!loading && form.name.trim() ? { scale: 1.02 } : {}}
+                whileTap={!loading && form.name.trim() ? { scale: 0.97 } : {}}
+                transition={spring}
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     Saving...
                   </span>
                 ) : (
-                  "Save Pet →"
+                  "Save Pet 🐾"
                 )}
-              </Button>
+              </motion.button>
               <Link href="/dashboard">
-                <Button variant="outline" className="border-[#333] text-[#f5f5f5]/60 hover:text-[#f5f5f5] hover:bg-[#141414] h-11">
+                <button
+                  type="button"
+                  className="btn-secondary h-11 px-6"
+                >
                   Cancel
-                </Button>
+                </button>
               </Link>
             </div>
           </form>

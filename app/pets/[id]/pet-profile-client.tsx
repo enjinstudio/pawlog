@@ -43,6 +43,18 @@ function daysUntil(dateStr: string) {
   return `In ${diff}d`;
 }
 
+function getReminderBadge(dateStr: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  const diff = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  if (diff < 0) return { background: "#FEE7E7", color: "#C53030" };
+  if (diff <= 7) return { background: "#FEF3DC", color: "#92600A" };
+  return { background: "#E8F8EF", color: "#2E7D52" };
+}
+
+const spring = { type: "spring" as const, stiffness: 300, damping: 20 };
+
 export function PetProfileClient({ pet, entries }: PetProfileClientProps) {
   const today = new Date().toISOString().split("T")[0];
   const reminders = entries.filter((e) => e.next_due && e.next_due >= today);
@@ -52,21 +64,24 @@ export function PetProfileClient({ pet, entries }: PetProfileClientProps) {
   const copyPassportLink = () => {
     const url = `${window.location.origin}/passport/${pet.id}`;
     navigator.clipboard.writeText(url).then(() => {
-      toast.success("Passport link copied!");
+      toast.success("Passport link copied! 📋");
     });
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5]">
+    <div className="min-h-screen" style={{ background: "#FEFCF8", color: "#2D2420" }}>
       {/* Header */}
-      <header className="border-b border-[#222] px-6 py-4">
+      <header
+        className="px-6 py-4"
+        style={{ borderBottom: "1.5px solid #EBE7E0", background: "#FFFFFF" }}
+      >
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
             <span className="text-xl">🐾</span>
-            <span className="font-bold tracking-tight">PawLog</span>
+            <span className="font-semibold tracking-tight" style={{ color: "#2D2420" }}>PawLog</span>
           </Link>
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-[#f5f5f5]/50 hover:text-[#f5f5f5]">
+            <Button variant="ghost" size="sm" style={{ color: "#8C7B72" }} className="hover:text-[#2D2420]">
               ← Dashboard
             </Button>
           </Link>
@@ -78,30 +93,50 @@ export function PetProfileClient({ pet, entries }: PetProfileClientProps) {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="bg-[#141414] border border-[#222] p-6 mb-6"
+          transition={{ duration: 0.35, ...spring }}
+          className="card p-6 mb-6"
+          style={{ background: "#FFFFFF" }}
         >
           <div className="flex items-start gap-5">
             {/* Avatar */}
             {pet.photo_url ? (
-              <img src={pet.photo_url} alt={pet.name} className="w-20 h-20 object-cover flex-shrink-0" />
+              <img
+                src={pet.photo_url}
+                alt={pet.name}
+                className="w-20 h-20 object-cover flex-shrink-0"
+                style={{ borderRadius: "50%", border: "3px solid #EBE7E0" }}
+              />
             ) : (
-              <div className="w-20 h-20 bg-[#F5A623]/20 border border-[#F5A623]/30 flex items-center justify-center text-[#F5A623] font-bold text-2xl flex-shrink-0">
+              <motion.div
+                className="w-20 h-20 flex items-center justify-center font-bold text-2xl flex-shrink-0"
+                style={{
+                  borderRadius: "50%",
+                  background: "#FFF0F3",
+                  border: "3px solid #FFD6E0",
+                  color: "#FF6B8A",
+                }}
+                whileHover={{ scale: 1.05 }}
+                transition={spring}
+              >
                 {initials}
-              </div>
+              </motion.div>
             )}
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap mb-1">
-                <h1 className="text-2xl font-bold">{pet.name}</h1>
+                <h1 className="text-2xl font-semibold" style={{ color: "#2D2420" }}>
+                  {pet.name}
+                </h1>
                 {pet.gender && pet.gender !== "unknown" && (
-                  <span className="text-sm text-[#f5f5f5]/40">
+                  <span className="text-sm" style={{ color: "#8C7B72" }}>
                     {pet.gender === "male" ? "♂️ Male" : "♀️ Female"}
                   </span>
                 )}
               </div>
-              {pet.breed && <p className="text-[#f5f5f5]/50 mb-2">{pet.breed}</p>}
-              <div className="flex flex-wrap gap-4 text-sm text-[#f5f5f5]/40">
+              {pet.breed && (
+                <p className="mb-2" style={{ color: "#8C7B72" }}>{pet.breed}</p>
+              )}
+              <div className="flex flex-wrap gap-4 text-sm" style={{ color: "#8C7B72" }}>
                 {age && <span>🎂 {age}</span>}
                 {pet.dob && <span>{formatDate(pet.dob)}</span>}
                 {pet.weight_kg && <span>⚖️ {pet.weight_kg} kg</span>}
@@ -110,29 +145,52 @@ export function PetProfileClient({ pet, entries }: PetProfileClientProps) {
 
             <div className="flex flex-col gap-2 flex-shrink-0">
               <Link href={`/pets/${pet.id}/add`}>
-                <Button size="sm" className="bg-[#E3170A] hover:bg-[#E3170A]/90 text-white border-0 text-xs">
+                <motion.button
+                  className="btn-primary text-xs"
+                  style={{ minHeight: 36, padding: "0 1rem" }}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={spring}
+                >
                   + Add Entry
-                </Button>
+                </motion.button>
               </Link>
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-[#333] text-[#f5f5f5]/60 hover:text-[#f5f5f5] hover:bg-[#1a1a1a] text-xs"
+              <motion.button
+                className="btn-secondary text-xs"
+                style={{ minHeight: 36, padding: "0 1rem" }}
                 onClick={copyPassportLink}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                transition={spring}
               >
                 📄 Share Passport
-              </Button>
+              </motion.button>
             </div>
           </div>
         </motion.div>
 
         {/* Tabs */}
         <Tabs defaultValue="timeline">
-          <TabsList className="bg-[#141414] border border-[#222] mb-6 w-full justify-start h-10">
-            <TabsTrigger value="timeline" className="text-sm data-[state=active]:bg-[#E3170A] data-[state=active]:text-white">
+          <TabsList
+            className="mb-6 w-full justify-start h-11"
+            style={{
+              background: "#FFFFFF",
+              border: "1.5px solid #EBE7E0",
+              borderRadius: 12,
+            }}
+          >
+            <TabsTrigger
+              value="timeline"
+              className="text-sm rounded-lg data-[state=active]:text-white"
+              style={{ borderRadius: 8 }}
+            >
               Timeline ({entries.length})
             </TabsTrigger>
-            <TabsTrigger value="reminders" className="text-sm data-[state=active]:bg-[#E3170A] data-[state=active]:text-white">
+            <TabsTrigger
+              value="reminders"
+              className="text-sm rounded-lg data-[state=active]:text-white"
+              style={{ borderRadius: 8 }}
+            >
               Reminders {reminders.length > 0 && `(${reminders.length})`}
             </TabsTrigger>
           </TabsList>
@@ -140,46 +198,74 @@ export function PetProfileClient({ pet, entries }: PetProfileClientProps) {
           {/* Timeline */}
           <TabsContent value="timeline">
             {entries.length === 0 ? (
-              <div className="bg-[#141414] border border-[#222] border-dashed p-12 text-center">
+              <div
+                className="card p-12 text-center"
+                style={{ background: "#FEFCF8", border: "2px dashed #EBE7E0" }}
+              >
                 <div className="text-4xl mb-3">📋</div>
-                <h3 className="font-medium mb-2">No health entries yet</h3>
-                <p className="text-[#f5f5f5]/40 text-sm mb-5">
+                <h3 className="font-semibold mb-2" style={{ color: "#2D2420" }}>
+                  No health entries yet
+                </h3>
+                <p className="text-sm mb-5" style={{ color: "#8C7B72" }}>
                   Start logging {pet.name}&apos;s health history.
                 </p>
                 <Link href={`/pets/${pet.id}/add`}>
-                  <Button className="bg-[#E3170A] hover:bg-[#E3170A]/90 text-white border-0">
-                    Add First Entry
-                  </Button>
+                  <motion.button
+                    className="btn-primary"
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    transition={spring}
+                  >
+                    Add First Entry 🐾
+                  </motion.button>
                 </Link>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {entries.map((entry, i) => (
                   <motion.div
                     key={entry.id}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: i * 0.04 }}
-                    className="bg-[#141414] border border-[#222] p-4 hover:border-[#333] transition-colors"
+                    transition={{ duration: 0.25, delay: i * 0.04, ...spring }}
+                    whileHover={{ y: -1 }}
+                    className="card p-4"
+                    style={{ background: "#FFFFFF" }}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1.5">
                           <EntryBadge type={entry.type as EntryType} size="sm" />
-                          <span className="text-xs text-[#f5f5f5]/40">{formatDate(entry.date)}</span>
+                          <span className="text-xs" style={{ color: "#C4B8B0" }}>
+                            {formatDate(entry.date)}
+                          </span>
                         </div>
-                        <p className="font-medium text-[#f5f5f5]">{entry.title}</p>
+                        <p className="font-medium" style={{ color: "#2D2420" }}>
+                          {entry.title}
+                        </p>
                         {entry.vet_name && (
-                          <p className="text-sm text-[#f5f5f5]/40 mt-0.5">🩺 {entry.vet_name}</p>
+                          <p className="text-sm mt-0.5" style={{ color: "#8C7B72" }}>
+                            🩺 {entry.vet_name}
+                          </p>
                         )}
                         {entry.weight_kg && (
-                          <p className="text-sm text-[#f5f5f5]/40 mt-0.5">⚖️ {entry.weight_kg} kg</p>
+                          <p className="text-sm mt-0.5" style={{ color: "#8C7B72" }}>
+                            ⚖️ {entry.weight_kg} kg
+                          </p>
                         )}
                         {entry.notes && (
-                          <p className="text-sm text-[#f5f5f5]/50 mt-2 leading-relaxed">{entry.notes}</p>
+                          <p
+                            className="text-sm mt-2 leading-relaxed"
+                            style={{ color: "#8C7B72" }}
+                          >
+                            {entry.notes}
+                          </p>
                         )}
                         {entry.next_due && (
-                          <p className="text-xs text-[#F5A623] mt-2">
+                          <p
+                            className="text-xs mt-2 font-medium"
+                            style={{ color: "#92600A" }}
+                          >
                             🔔 Next due: {formatDate(entry.next_due)} ({daysUntil(entry.next_due)})
                           </p>
                         )}
@@ -194,37 +280,51 @@ export function PetProfileClient({ pet, entries }: PetProfileClientProps) {
           {/* Reminders */}
           <TabsContent value="reminders">
             {reminders.length === 0 ? (
-              <div className="bg-[#141414] border border-[#222] p-8 text-center">
+              <div className="card p-8 text-center" style={{ background: "#FFFFFF" }}>
                 <div className="text-3xl mb-3">✅</div>
-                <h3 className="font-medium mb-1">All clear!</h3>
-                <p className="text-[#f5f5f5]/40 text-sm">No upcoming reminders for {pet.name}.</p>
+                <h3 className="font-semibold mb-1" style={{ color: "#2D2420" }}>All clear!</h3>
+                <p className="text-sm" style={{ color: "#8C7B72" }}>
+                  No upcoming reminders for {pet.name}.
+                </p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {reminders
                   .sort((a, b) => (a.next_due! > b.next_due! ? 1 : -1))
-                  .map((r, i) => (
-                    <motion.div
-                      key={r.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.25, delay: i * 0.04 }}
-                      className="bg-[#141414] border border-[#222] p-4"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <EntryBadge type={r.type as EntryType} size="sm" />
+                  .map((r, i) => {
+                    const badgeStyle = getReminderBadge(r.next_due!);
+                    return (
+                      <motion.div
+                        key={r.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25, delay: i * 0.04, ...spring }}
+                        whileHover={{ y: -1 }}
+                        className="card p-4"
+                        style={{ background: "#FFFFFF" }}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <EntryBadge type={r.type as EntryType} size="sm" />
+                            </div>
+                            <p className="font-medium" style={{ color: "#2D2420" }}>
+                              {r.title}
+                            </p>
+                            <p className="text-xs mt-0.5" style={{ color: "#C4B8B0" }}>
+                              {formatDate(r.next_due!)}
+                            </p>
                           </div>
-                          <p className="font-medium text-[#f5f5f5]">{r.title}</p>
-                          <p className="text-xs text-[#f5f5f5]/40 mt-0.5">{formatDate(r.next_due!)}</p>
+                          <span
+                            className="text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
+                            style={badgeStyle}
+                          >
+                            {daysUntil(r.next_due!)}
+                          </span>
                         </div>
-                        <span className="text-sm font-medium text-[#F5A623] flex-shrink-0">
-                          {daysUntil(r.next_due!)}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    );
+                  })}
               </div>
             )}
           </TabsContent>
