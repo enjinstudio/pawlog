@@ -11,6 +11,7 @@ import { type Pet, type EntryType } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
+import { PawPrint } from "@/app/components/PawIcons";
 
 interface Reminder {
   id: string;
@@ -70,7 +71,7 @@ export function DashboardClient({ user, pets, reminders }: DashboardClientProps)
       <header className="px-6 py-4" style={{ borderBottom: "1.5px solid #EBE7E0", background: "#FFFFFF" }}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl">🐾</span>
+            <PawPrint size={20} color="#FF6B8A" strokeWidth={2} />
             <span className="font-semibold tracking-tight" style={{ color: "#2D2420" }}>PawLog</span>
           </Link>
           <div className="flex items-center gap-3">
@@ -125,13 +126,20 @@ export function DashboardClient({ user, pets, reminders }: DashboardClientProps)
               <h2 className="font-semibold" style={{ color: "#2D2420" }}>My Pets</h2>
               <Link href="/pets/new">
                 <motion.button
-                  className="btn-primary text-xs"
+                  className="btn-primary text-xs flex items-center gap-1.5"
                   style={{ minHeight: 36, padding: "0 1rem" }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={spring}
                 >
-                  + Add Pet
+                  <motion.span
+                    whileHover={{ rotate: 90 }}
+                    transition={spring}
+                    style={{ display: "inline-block" }}
+                  >
+                    +
+                  </motion.span>
+                  Add Pet
                 </motion.button>
               </Link>
             </div>
@@ -145,11 +153,11 @@ export function DashboardClient({ user, pets, reminders }: DashboardClientProps)
                 style={{ border: "2px dashed #EBE7E0", background: "#FEFCF8" }}
               >
                 <motion.div
-                  className="text-5xl mb-3"
+                  className="flex justify-center mb-3"
                   animate={{ y: [0, -6, 0] }}
                   transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  🐾
+                  <PawPrint size={80} color="#FF6B8A" strokeWidth={1} className="opacity-30" />
                 </motion.div>
                 <h3 className="font-semibold mb-2" style={{ color: "#2D2420" }}>No pets yet!</h3>
                 <p className="text-sm mb-5" style={{ color: "#8C7B72" }}>
@@ -157,12 +165,19 @@ export function DashboardClient({ user, pets, reminders }: DashboardClientProps)
                 </p>
                 <Link href="/pets/new">
                   <motion.button
-                    className="btn-primary"
+                    className="btn-primary rounded-full flex items-center gap-2 mx-auto"
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
                     transition={spring}
                   >
-                    Add Your First Pet 🐶
+                    <motion.span
+                      whileHover={{ rotate: 90 }}
+                      transition={spring}
+                      style={{ display: "inline-block", fontSize: 18, lineHeight: 1 }}
+                    >
+                      +
+                    </motion.span>
+                    Add Your First Pet
                   </motion.button>
                 </Link>
               </motion.div>
