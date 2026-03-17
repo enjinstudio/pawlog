@@ -73,7 +73,7 @@ export async function GET(request: Request) {
       host: 'aws-0-ap-southeast-2.pooler.supabase.com',
       port: 6543,
       database: 'postgres',
-      user: 'postgres.ablgxcbebsdsdocmffyk',
+      user: 'postgres.xpiykyqmbitpnvmdmorg',
       password: SUPABASE_DB_PASSWORD,
       ssl: { rejectUnauthorized: false },
     })
