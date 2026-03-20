@@ -58,35 +58,89 @@ export async function GET(request: Request) {
   }
 
   const SUPABASE_DB_PASSWORD = process.env.SUPABASE_DB_PASSWORD
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const PROJECT_REF = SUPABASE_URL?.match(/https:\/\/([^.]+)/)?.[1]
 
-  if (!SUPABASE_DB_PASSWORD) {
+  if (!SUPABASE_DB_PASSWORD || !PROJECT_REF) {
     return NextResponse.json({
       error: 'Missing SUPABASE_DB_PASSWORD env var',
-      instructions: 'Add SUPABASE_DB_PASSWORD to your Vercel environment variables, then call this endpoint again',
+      instructions: [
+        '1. Go to Supabase Dashboard > Settings > Database',
+        '2. Copy the database password',
+        '3. Run: npx vercel env add SUPABASE_DB_PASSWORD',
+        '4. Redeploy, then call this endpoint again',
+      ],
       migration_sql: TABLES_SQL.join(';\n\n'),
     }, { status: 500 })
   }
 
   try {
     const { default: pg } = await import('pg')
-    const client = new pg.Client({
-      host: 'aws-0-ap-southeast-2.pooler.supabase.com',
-      port: 6543,
-      database: 'postgres',
-      user: 'postgres.xpiykyqmbitpnvmdmorg',
-      password: SUPABASE_DB_PASSWORD,
-      ssl: { rejectUnauthorized: false },
-    })
 
-    await client.connect()
+    // Try direct connection first (IPv6, works from Vercel), then pooler (IPv4)
+    const configs = [
+      {
+        name: 'direct',
+        host: `db.${PROJECT_REF}.supabase.co`,
+        port: 5432,
+        user: 'postgres',
+        password: SUPABASE_DB_PASSWORD,
+        database: 'postgres',
+        ssl: { rejectUnauthorized: false },
+      },
+      {
+        name: 'pooler-session',
+        host: 'aws-0-ap-southeast-2.pooler.supabase.com',
+        port: 5432,
+        user: `postgres.${PROJECT_REF}`,
+        password: SUPABASE_DB_PASSWORD,
+        database: 'postgres',
+        ssl: { rejectUnauthorized: false },
+      },
+      {
+        name: 'pooler-transaction',
+        host: 'aws-0-ap-southeast-2.pooler.supabase.com',
+        port: 6543,
+        user: `postgres.${PROJECT_REF}`,
+        password: SUPABASE_DB_PASSWORD,
+        database: 'postgres',
+        ssl: { rejectUnauthorized: false },
+      },
+    ]
+
+    let connected = false
+    let client: InstanceType<typeof pg.Client> | null = null
+    const connectionErrors: string[] = []
+
+    for (const config of configs) {
+      try {
+        const c = new pg.Client(config)
+        await c.connect()
+        client = c
+        connected = true
+        console.log(`[setup] Connected via ${config.name}`)
+        break
+      } catch (e) {
+        connectionErrors.push(`${config.name}: ${e instanceof Error ? e.message : String(e)}`)
+      }
+    }
+
+    if (!connected || !client) {
+      return NextResponse.json({
+        error: 'Could not connect to database',
+        attempts: connectionErrors,
+        hint: 'Check SUPABASE_DB_PASSWORD is correct (Dashboard > Settings > Database)',
+        migration_sql: TABLES_SQL.join(';\n\n'),
+      }, { status: 500 })
+    }
 
     const results = []
     for (const sql of TABLES_SQL) {
       try {
         await client.query(sql)
-        results.push({ sql: sql.slice(0, 50) + '...', status: 'ok' })
+        results.push({ sql: sql.slice(0, 60) + '...', status: 'ok' })
       } catch (e) {
-        results.push({ sql: sql.slice(0, 50) + '...', status: 'error', error: e instanceof Error ? e.message : String(e) })
+        results.push({ sql: sql.slice(0, 60) + '...', status: 'error', error: e instanceof Error ? e.message : String(e) })
       }
     }
 
@@ -94,9 +148,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ success: true, results })
   } catch (error) {
     return NextResponse.json({
-      error: 'Connection failed',
+      error: 'Migration failed',
       details: error instanceof Error ? error.message : String(error),
-      instructions: 'You can run the migration SQL manually in Supabase Dashboard > SQL Editor',
+      instructions: 'Run the migration SQL manually in Supabase Dashboard > SQL Editor',
       migration_sql: TABLES_SQL.join(';\n\n'),
     }, { status: 500 })
   }
